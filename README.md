@@ -1,5 +1,23 @@
 # <img src="src/docs/asciidoc/images/spring-framework.png" width="80" height="80"> Spring Framework
 
+## Spring Framework 源码学习
+
+项目 fork 时间：2019年4月2日
+
+release version：v5.1.6.RELEASE
+
+development version：5.2.0.BUILD-SNAPSHOT
+
+### 学习进度
+
+- IOC：正在学习
+- AOP：未开始
+- 未完待续...
+
+### 参考资料
+
+- 芋道源码 精尽 Spring 源码分析 
+
 This is the home of the Spring Framework: the foundation for all [Spring projects](https://spring.io/projects). Collectively the Spring Framework and the family of Spring projects is often referred to simply as "Spring". 
 
 Spring provides everything required beyond the Java programming language for creating enterprise applications for a wide range of scenarios and architectures. Please read the [Overview](https://docs.spring.io/spring/docs/current/spring-framework-reference/overview.html#spring-introduction) section as reference for a more complete introduction.
