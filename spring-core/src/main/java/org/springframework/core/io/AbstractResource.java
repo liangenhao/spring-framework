@@ -31,6 +31,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ResourceUtils;
 
 /**
+ * AbstractResource 是 Resource 默认抽象实现。
+ *
  * Convenience base class for {@link Resource} implementations,
  * pre-implementing typical behavior.
  *
@@ -44,6 +46,8 @@ import org.springframework.util.ResourceUtils;
 public abstract class AbstractResource implements Resource {
 
 	/**
+	 * 检测是否可以打开文件
+	 *
 	 * This implementation checks whether a File can be opened,
 	 * falling back to whether an InputStream can be opened.
 	 * This will cover both directories and content resources.
@@ -67,6 +71,9 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 对于存在的资源(exists())，此实现始终返回true。
+	 * 注意：该方法从 5.1 进行了更改，5.1 以前直接返回true
+	 *
 	 * This implementation always returns {@code true} for a resource
 	 * that {@link #exists() exists} (revised as of 5.1).
 	 */
@@ -76,6 +83,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 直接返回false，未打开
+	 *
 	 * This implementation always returns {@code false}.
 	 */
 	@Override
@@ -84,6 +93,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 直接返回false，不是File
+	 *
 	 * This implementation always returns {@code false}.
 	 */
 	@Override
@@ -92,6 +103,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 抛出 FileNotFoundException 异常，由子类实现
+	 *
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that the resource cannot be resolved to a URL.
 	 */
@@ -101,6 +114,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 通过URL构建URI
+	 *
 	 * This implementation builds a URI based on the URL returned
 	 * by {@link #getURL()}.
 	 */
@@ -116,6 +131,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 抛出 FileNotFoundException 异常，有子类实现
+	 *
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that the resource cannot be resolved to an absolute file path.
 	 */
@@ -125,6 +142,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 根据 getInputStream() 的返回结果构建 ReadableByteChannel
+	 *
 	 * This implementation returns {@link Channels#newChannel(InputStream)}
 	 * with the result of {@link #getInputStream()}.
 	 * <p>This is the same as in {@link Resource}'s corresponding default method
@@ -136,6 +155,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 通过 getInputStream 获取字节长度
+	 *
 	 * This implementation reads the entire InputStream to calculate the
 	 * content length. Subclasses will almost always be able to provide
 	 * a more optimal version of this, e.g. checking a File length.
@@ -163,6 +184,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 资源最后修改时间，通过 File.lastModified() 实现
+	 *
 	 * This implementation checks the timestamp of the underlying File,
 	 * if available.
 	 * @see #getFileForLastModifiedCheck()
@@ -191,6 +214,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 抛出 FileNotFoundException 异常，由子类实现
+	 *
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that relative resources cannot be created for this resource.
 	 */
@@ -200,6 +225,8 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 文件名直接返回null，由子类实现
+	 *
 	 * This implementation always returns {@code null},
 	 * assuming that this resource type does not have a filename.
 	 */

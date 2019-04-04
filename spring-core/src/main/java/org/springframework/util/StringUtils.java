@@ -626,6 +626,11 @@ public abstract class StringUtils {
 	}
 
 	/**
+	 * 该方法主要是为了规范化路径，方便对照
+	 * 1. 将路径中的 "\\" 替换成 "/"
+	 * 2. 优化 "path/.."
+	 * 详见测试用例{@link org.springframework.util.StringUtilsTests#testCleanPath()}
+	 *
 	 * Normalize the path by suppressing sequences like "path/.." and
 	 * inner simple dots.
 	 * <p>The result is convenient for path comparison. For other uses,
@@ -637,6 +642,7 @@ public abstract class StringUtils {
 		if (!hasLength(path)) {
 			return path;
 		}
+		// 将路径中的 "\\" 替换成 "/"
 		String pathToUse = replace(path, WINDOWS_FOLDER_SEPARATOR, FOLDER_SEPARATOR);
 
 		// Shortcut if there is no work to do

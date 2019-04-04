@@ -27,6 +27,8 @@ import java.nio.channels.ReadableByteChannel;
 import org.springframework.lang.Nullable;
 
 /**
+ * Resource 是 Spring 框架所有资源的抽象和访问接口
+ *
  * Interface for a resource descriptor that abstracts from the actual
  * type of underlying resource, such as a file or class path resource.
  *
@@ -150,6 +152,8 @@ public interface Resource extends InputStreamSource {
 	long lastModified() throws IOException;
 
 	/**
+	 * 根据资源的相对路径创建新资源
+	 *
 	 * Create a resource relative to this resource.
 	 * @param relativePath the relative path (relative to this resource)
 	 * @return the resource handle for the relative resource
@@ -158,6 +162,8 @@ public interface Resource extends InputStreamSource {
 	Resource createRelative(String relativePath) throws IOException;
 
 	/**
+	 * 不带路径信息的文件名
+	 *
 	 * Determine a filename for this resource, i.e. typically the last
 	 * part of the path: for example, "myfile.txt".
 	 * <p>Returns {@code null} if this type of resource does not
@@ -167,6 +173,8 @@ public interface Resource extends InputStreamSource {
 	String getFilename();
 
 	/**
+	 * 用于在错误处理中打印信息
+	 *
 	 * Return a description for this resource,
 	 * to be used for error output when working with the resource.
 	 * <p>Implementations are also encouraged to return this value
