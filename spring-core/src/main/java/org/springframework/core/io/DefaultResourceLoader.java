@@ -31,6 +31,10 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * {@link ResourceLoader} 的默认实现
+ *
+ *
+ *
  * Default implementation of the {@link ResourceLoader} interface.
  * Used by {@link ResourceEditor}, and serves as base class for
  * {@link org.springframework.context.support.AbstractApplicationContext}.
@@ -56,6 +60,8 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 
 	/**
+	 * 无参构造：classLoader 默认是当前线程上下文的类加载器
+	 *
 	 * Create a new DefaultResourceLoader.
 	 * <p>ClassLoader access will happen using the thread context class loader
 	 * at the time of this ResourceLoader's initialization.
@@ -140,30 +146,43 @@ public class DefaultResourceLoader implements ResourceLoader {
 	}
 
 
+	/**
+	 * 根据对 location 的分析，返回相应的Resource实现类对象。
+	 * @param location the resource location
+	 * @return
+	 */
 	@Override
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
 
+		// 通过 ProtocolResolver 来加载资源（SPI 技术）
+		// ProtocolResolver 是用户自定义资源解决策略
+		// 如果想自定义 ResourceLoader，不需要直接继承 DefaultResourceLoader ，可以实现ProtocolResolver也可以实现自定义 ResourceLoader
+		// 用户可以自定义 ProtocolResolver 的实现类，并使用 org.springframework.core.io.DefaultResourceLoader.addProtocolResolver 方法添加即可。
 		for (ProtocolResolver protocolResolver : this.protocolResolvers) {
 			Resource resource = protocolResolver.resolve(location, this);
 			if (resource != null) {
 				return resource;
 			}
 		}
-
+		// 若 location 以 "/" 开头（绝对路径），返回 ClassPathContextResource 对象（是 ClassPathResource 的实现类）
 		if (location.startsWith("/")) {
 			return getResourceByPath(location);
 		}
+		// 若 location 以 "classpath:"开头，返回 ClassPathResource 对象
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
+				// 尝试将 location 解析成 URL
 				// Try to parse the location as a URL...
 				URL url = new URL(location);
+				// 如果 url 是 FileURL，则返回 FileUrlResource 对象，否则返回 UrlResource 对象。
 				return (ResourceUtils.isFileURL(url) ? new FileUrlResource(url) : new UrlResource(url));
 			}
 			catch (MalformedURLException ex) {
+				// 如果抛出 MalformedURLException 异常，说明不是URL，则返回 ClassPathContextResource 对象。
 				// No URL -> resolve as resource path.
 				return getResourceByPath(location);
 			}

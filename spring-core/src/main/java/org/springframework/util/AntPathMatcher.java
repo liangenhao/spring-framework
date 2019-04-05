@@ -166,7 +166,11 @@ public class AntPathMatcher implements PathMatcher {
 		this.stringMatcherCache.clear();
 	}
 
-
+	/**
+	 * path 中是否包含通配符 * 或者 ?
+	 * @param path the path String to check
+	 * @return
+	 */
 	@Override
 	public boolean isPattern(String path) {
 		return (path.indexOf('*') != -1 || path.indexOf('?') != -1);

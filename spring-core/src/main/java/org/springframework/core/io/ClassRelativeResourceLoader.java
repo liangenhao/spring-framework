@@ -20,6 +20,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * ResourceLoader实现，它将普通资源路径解释为相对于给定java.lang.Class。
+ * 和 FileSystemResourceLoader 类似，在实现代码的结构上类似，也是覆写 #getResourceByPath(String path) 方法
+ *
+ * 扩展的功能是，可以根据给定的class 所在包或者所在包的子包下加载资源。
+ *
  * {@link ResourceLoader} implementation that interprets plain resource paths
  * as relative to a given {@code java.lang.Class}.
  *

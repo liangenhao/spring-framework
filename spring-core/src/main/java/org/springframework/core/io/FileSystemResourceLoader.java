@@ -17,6 +17,9 @@
 package org.springframework.core.io;
 
 /**
+ * ResourceLoader实现，
+ * 它将普通路径解析为文件系统资源而不是类路径资源(后者是DefaultResourceLoader的默认策略)。
+ *
  * {@link ResourceLoader} implementation that resolves plain paths as
  * file system resources rather than as class path resources
  * (the latter is {@link DefaultResourceLoader}'s default strategy).
