@@ -37,6 +37,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 对File和Path资源的封装的Resource实现
+ * 从Spring 5开始，使用nio2进行读写操作
+ *
  * {@link Resource} implementation for {@code java.io.File} and
  * {@code java.nio.file.Path} handles with a file system target.
  * Supports resolution as a {@code File} and also as a {@code URL}.

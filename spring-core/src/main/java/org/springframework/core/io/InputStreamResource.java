@@ -23,6 +23,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * InputStream的Resource实现
+ * 只有在没有其他特定资源实现可用时才应使用。特别是，尽可能选择ByteArrayResource或任何基于文件的资源实现。
+ *
+ * 如果需要将资源描述符保存在某个地方，或者需要多次从流中读取，则不要使用InputStreamResource。
+ *
  * {@link Resource} implementation for a given {@link InputStream}.
  * <p>Should only be used if no other specific {@code Resource} implementation
  * is applicable. In particular, prefer {@link ByteArrayResource} or any of the

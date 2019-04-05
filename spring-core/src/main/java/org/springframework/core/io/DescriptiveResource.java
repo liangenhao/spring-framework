@@ -23,6 +23,10 @@ import java.io.InputStream;
 import org.springframework.lang.Nullable;
 
 /**
+ * 包含资源描述但不指向实际可读资源的简单资源实现。
+ *
+ * 如果API期望某个资源参数，但不一定用于实际读取，则将其用作占位符。
+ *
  * Simple {@link Resource} implementation that holds a resource description
  * but does not point to an actually readable resource.
  *

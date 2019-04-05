@@ -32,6 +32,8 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * url定位器的Resource实现。
+ *
  * {@link Resource} implementation for {@code java.net.URL} locators.
  * Supports resolution as a {@code URL} and also as a {@code File} in
  * case of the {@code "file:"} protocol.

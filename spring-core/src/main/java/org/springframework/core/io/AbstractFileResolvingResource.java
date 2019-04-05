@@ -31,6 +31,9 @@ import java.nio.file.StandardOpenOption;
 import org.springframework.util.ResourceUtils;
 
 /**
+ * 将url解析为文件引用(如UrlResource或ClassPathResource)的资源的抽象基类。
+ * 检测url中的“文件”协议和JBoss“vfs”协议，相应地解析文件系统引用。
+ *
  * Abstract base class for resources which resolve URLs into File references,
  * such as {@link UrlResource} or {@link ClassPathResource}.
  *

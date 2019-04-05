@@ -25,6 +25,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 对字节数组封装的Resource实现，会根据提供的字节数组，创建一个ByteArrayInputStream
+ *
  * {@link Resource} implementation for a given byte array.
  * <p>Creates a {@link ByteArrayInputStream} for the given byte array.
  *
