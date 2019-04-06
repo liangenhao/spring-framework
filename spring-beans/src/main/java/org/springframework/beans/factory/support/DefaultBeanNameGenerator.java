@@ -19,6 +19,10 @@ package org.springframework.beans.factory.support;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
+ * 默认的Bean名称生成器，作用于匿名的Bean。
+ *
+ * 该实现委托给了 {@link BeanDefinitionReaderUtils#generateBeanName(BeanDefinition, BeanDefinitionRegistry)} 来实现
+ *
  * Default implementation of the {@link BeanNameGenerator} interface, delegating to
  * {@link BeanDefinitionReaderUtils#generateBeanName(BeanDefinition, BeanDefinitionRegistry)}.
  *

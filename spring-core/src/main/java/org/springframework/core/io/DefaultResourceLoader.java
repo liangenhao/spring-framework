@@ -33,6 +33,10 @@ import org.springframework.util.StringUtils;
 /**
  * {@link ResourceLoader} 的默认实现
  *
+ * 核心方法 {@link DefaultResourceLoader#getResource(java.lang.String)}
+ *
+ * 自定义 {@link ResourceLoader} ，使用SPI的方式，实现 {@link ProtocolResolver} 接口。
+ * 具体查看 {@link DefaultResourceLoader#getResource(java.lang.String)} 解释
  *
  *
  * Default implementation of the {@link ResourceLoader} interface.

@@ -51,6 +51,9 @@ import org.springframework.util.xml.SimpleSaxErrorHandler;
 import org.springframework.util.xml.XmlValidationModeDetector;
 
 /**
+ * {@link AbstractBeanDefinitionReader} 具体实现类，用于xml文件的读取解析。
+ * 具体实现委托给了{@link BeanDefinitionDocumentReader}处理。
+ *
  * Bean definition reader for XML bean definitions.
  * Delegates the actual XML document reading to an implementation
  * of the {@link BeanDefinitionDocumentReader} interface.
@@ -126,6 +129,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	private final XmlValidationModeDetector validationModeDetector = new XmlValidationModeDetector();
 
+	/**
+	 * 当前线程，正在加载的 {@link EncodedResource} 集合。
+	 */
 	private final ThreadLocal<Set<EncodedResource>> resourcesCurrentlyBeingLoaded =
 			new NamedThreadLocal<>("XML bean definition resources currently being loaded");
 
@@ -301,6 +307,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 */
 	@Override
 	public int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException {
+		// EncodedResource: 对 Resource 进行编码，保证内容读取的正确性
 		return loadBeanDefinitions(new EncodedResource(resource));
 	}
 
@@ -316,13 +323,17 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Loading XML bean definitions from " + encodedResource);
 		}
-		// 通过属性来记录已经加载的资源
+		// 获取当前线程已经加载的资源（EncodedResource）
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
+			// 如果当前线程尚未加载过资源（EncodedResource）
 			currentResources = new HashSet<>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
+		// 将传递进来的资源（EncodedResource）添加进集合，如果该资源已存在，抛出异常
 		if (!currentResources.add(encodedResource)) {
+			// 避免一个 EncodedResource 在加载时，还没加载完成，又加载自身，从而导致死循环。
+			// 也因此，在 该方法最后处，当一个 EncodedResource 加载完成后，需要从缓存中剔除。
 			throw new BeanDefinitionStoreException(
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
@@ -334,9 +345,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 				// inputStream 封装成 InputSource，该类来自于 org.xml.sax.InputSource
 				InputSource inputSource = new InputSource(inputStream);
 				if (encodedResource.getEncoding() != null) {
+					// 设置编码
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
-				// 核心逻辑
+				// 核心逻辑，真正开始加载BeanDefinition
 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			}
 			finally {
@@ -348,6 +360,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					"IOException parsing XML document from " + encodedResource.getResource(), ex);
 		}
 		finally {
+			// 从缓存中删除该资源
 			currentResources.remove(encodedResource);
 			if (currentResources.isEmpty()) {
 				this.resourcesCurrentlyBeingLoaded.remove();
@@ -437,7 +450,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see DocumentLoader#loadDocument
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
-		// getValidationModeForResource：获取对xml文件的验证模式：DTD、XSD
+		// 1. getValidationModeForResource：获取对xml文件的验证模式：DTD、XSD
+		// 2. 获取xml Document对象
 		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
 				getValidationModeForResource(resource), isNamespaceAware());
 	}

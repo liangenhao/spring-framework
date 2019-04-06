@@ -35,6 +35,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * {@link BeanDefinitionReader} 的默认实现
+ *
  * Abstract base class for bean definition readers which implement
  * the {@link BeanDefinitionReader} interface.
  *
@@ -65,6 +67,13 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 
 	/**
+	 * 如果传入的bean工厂不仅实现{@link BeanDefinitionRegistry}接口，而且还实现{@link ResourceLoader}接口，那么它还将用作默认的{@link ResourceLoader}。
+	 * 通常是 {@link org.springframework.context.ApplicationContext} 的实现类。
+	 *
+	 * 如果给定一个普通的{@link BeanDefinitionRegistry}，默认的{@link ResourceLoader}将是{@link PathMatchingResourcePatternResolver}。
+	 *
+	 * 如果传入的bean工厂也实现了{@link EnvironmentCapable}，那么该Reader将使用它的环境。否则，读取器将初始化并使用标准环境{@link StandardEnvironment}。
+	 *
 	 * Create a new AbstractBeanDefinitionReader for the given bean factory.
 	 * <p>If the passed-in bean factory does not only implement the BeanDefinitionRegistry
 	 * interface but also the ResourceLoader interface, it will be used as default
@@ -86,13 +95,16 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		this.registry = registry;
 
 		// Determine ResourceLoader to use.
+		// 如果传入参数是 ResourceLoader，则作为默认的 resourceLoader
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
 		}
+		// 传入的参数不是 ResourceLoader，则 resourceLoader，使用 PathMatchingResourcePatternResolver
 		else {
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
 
+		// 环境设置
 		// Inherit Environment if possible
 		if (this.registry instanceof EnvironmentCapable) {
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
@@ -166,6 +178,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
+	 * 指定Bean的名称生成器，作用于匿名的Bean。
+	 *
 	 * Set the BeanNameGenerator to use for anonymous beans
 	 * (without explicit bean name specified).
 	 * <p>Default is a {@link DefaultBeanNameGenerator}.
@@ -179,7 +193,13 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		return this.beanNameGenerator;
 	}
 
-
+	/**
+	 * 通过 Resource可变参数 来加载资源，具体实现由子类的 loadBeanDefinitions(Resource) 方法实现
+	 *
+	 * @param resources the resource descriptors
+	 * @return
+	 * @throws BeanDefinitionStoreException
+	 */
 	@Override
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
@@ -196,6 +216,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	/**
+	 * 从指定的资源位置加载bean定义。
+	 * 位置也可以是位置模式，前提是这个bean定义阅读器的{@link ResourceLoader}是 {@link ResourcePatternResolver}。
+	 *
+	 * 具体实现原理：使用 {@link ResourceLoader} 的实现类解析location, 获取 {@link Resource} 子类对象
+	 * 然后调用{@link #loadBeanDefinitions(Resource...)} 加载。
+	 *
 	 * Load bean definitions from the specified resource location.
 	 * <p>The location can also be a location pattern, provided that the
 	 * ResourceLoader of this bean definition reader is a ResourcePatternResolver.
@@ -217,6 +243,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 					"Cannot load bean definitions from location [" + location + "]: no ResourceLoader available");
 		}
 
+		// 如果 resourceLoader 是 ResourcePatternResolver，则是用 ResourcePatternResolver 加载资源
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
@@ -236,6 +263,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			}
 		}
 		else {
+			// 如果 resourceLoader 不是 ResourcePatternResolver，则只能加载单个 Resource
 			// Can only load single resources by absolute URL.
 			Resource resource = resourceLoader.getResource(location);
 			int count = loadBeanDefinitions(resource);

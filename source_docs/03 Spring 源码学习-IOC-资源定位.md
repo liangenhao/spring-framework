@@ -1,13 +1,23 @@
 ---
-title: 03 Spring 源码学习-IOC-Resource和ResourceLoader
+title: 03 Spring 源码学习-IOC-资源定位
 date: 2019-04-04
 categories: 源码学习
 tags: [Spring]
 ---
 
+## 什么是资源定位
+
+IOC容器使用的第一个步骤：资源定位。
+
+通常使用外部资源（配置文件）来描述Bean对象，资源定位就是定位到该外部配置文件，封装成Resource对象。
+
+**注意，此时并没有读取和解析该配置文件的内容。**
+
+读取和解析在下一步，通过``BeanDefinitionReader`处理。
+
 ## 资源定义 - Resource
 
-### 总览
+### Resource 体系结构一览
 
 由于 Java 中的 `URLStreamHandler` 不能满足读取不同来源的资源，所以 Spring 实现了自己的抽象结构：`Resource`接口。
 
@@ -44,9 +54,11 @@ tags: [Spring]
 
 ## 资源加载 - ResourceLoader
 
-![资源加载器相关类图](images/资源加载器相关类图.png)
+### ResourceLoader 体系结构一览
 
-### ResourceLoader
+Spring 将资源的定义和资源的加载区分开了，Resource 定义了统一的资源，**那资源的加载则由 ResourceLoader 来统一定义**。
+
+![资源加载器相关类图](images/资源加载器相关类图.png)
 
 ResourceLoader，定义资源加载器，主要应用于根据给定的资源文件地址，返回对应的 Resource 。
 
@@ -127,10 +139,11 @@ System.out.println("fileResource1 is FileSystemResource:" + (fileResource1 insta
 ## Resource 和 ResourceLoader 的关系
 
 - `Resource` 有很多的实现类：`UrlResource`、`ClassPathResource` 等等。
-
-- 如果我们直接用`Resource`来获取一个``Resource`子类对象，你首先得知道既要获取的资源什么类型的，才能new出对应的子类对象。
-
-- `ResourceLoader`相当于策略者模式，`org.springframework.core.io.DefaultResourceLoader#getResource`方法会根据传入的路径进行分析，返回出对应的`Resource`子类对象。例如`DefaultResourceLoader#getResource`
+- 如果我们直接用`Resource`来获取一个`Resource`子类对象，你首先得知道既要获取的资源什么类型的，才能new出对应的子类对象。
+- `ResourceLoader`相当于策略者模式，例如：`DefaultResourceLoader#getResource`方法会根据传入的路径进行分析，返回出对应的`Resource`子类对象。
+- 总结：
+  - `Resource`是Spring对资源的封装。
+  - `ResourceLoader`是对资源的加载，创建出`Resource`子类对象。
 
 
 ## 参考资料

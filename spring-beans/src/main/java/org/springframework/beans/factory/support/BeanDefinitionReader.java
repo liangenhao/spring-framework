@@ -22,6 +22,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
 /**
+ * 加载 {@link org.springframework.beans.factory.config.BeanDefinition} 的接口
+ *
+ * 可以使用 {@link Resource} 或 资源路径(location) 来加载资源。
+ *
  * Simple interface for bean definition readers.
  * Specifies load methods with Resource and String location parameters.
  *
