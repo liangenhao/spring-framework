@@ -49,18 +49,18 @@ reader.loadBeanDefinitions(resource); // 4
 
 1. 资源定位，通常用外部资源（配置文件）来描述bean对象，因此是首先定位到外部这个资源（Resource）。
 
-   > 详见：[Spring 源码学习-IOC-资源定位](03 Spring 源码学习-IOC-资源定位.md)
+   > 详见：[Spring 源码学习-IOC-资源定位](./03 Spring 源码学习-IOC-资源定位.md)
 
 2. 装载，就是 `BeanDefinition` 的载入。使用`BeanDefinitionReader`读取解析`Resource`资源，将bean表示成`BeanDefinition `。
 
-   > 详见：[Spring 源码学习-IOC-资源装载](04 Spring 源码学习-IOC-资源装载)
+   > 详见：[Spring 源码学习-IOC-资源装载](./04 Spring 源码学习-IOC-资源装载)
 
    - 在 IoC 容器内部维护着一个 `BeanDefinition` Map 的数据结构。
    - 在配置文件中每一个 `<bean>` 都对应着一个 `BeanDefinition` 对象。
 
 3. 注册，TODO
 
-   > 详见：[]()
+   > 详见：
 
 
 

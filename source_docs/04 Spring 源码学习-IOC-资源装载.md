@@ -179,12 +179,12 @@ public int registerBeanDefinitions(Document doc, Resource resource) throws BeanD
 
 ###### 第一步：doLoadDocument - 获取 Document 对象
 
-1. xml的模式验证：详见[04.1 Spring 源码学习-IOC-资源装载-获取XML验证模式](04.1 Spring 源码学习-IOC-资源装载-获取XML验证模式.md)
-2. 获取Document对象：详见[04.2 Spring 源码学习-IOC-资源装载-获取Document对象](04.2 Spring 源码学习-IOC-资源装载-获取Document对象.md)
+1. xml的模式验证：详见[04.1 Spring 源码学习-IOC-资源装载-获取XML验证模式](./04.1 Spring 源码学习-IOC-资源装载-获取XML验证模式.md)
+2. 获取Document对象：详见[04.2 Spring 源码学习-IOC-资源装载-获取Document对象](./04.2 Spring 源码学习-IOC-资源装载-获取Document对象.md)
 
 ###### 第二步：registerBeanDefinitions - 注册 BeanDefinition
 
-1. 注册 BeanDefinition：详见[04.3 Spring 源码学习-IOC-资源装载-注册BeanDefinition](04.3 Spring 源码学习-IOC-资源装载-注册BeanDefinition.md)
+1. 注册 BeanDefinition：详见[04.3 Spring 源码学习-IOC-资源装载-注册BeanDefinition](./04.3 Spring 源码学习-IOC-资源装载-注册BeanDefinition.md)
 
 
 
