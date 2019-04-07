@@ -131,6 +131,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/**
 	 * 当前线程，正在加载的 {@link EncodedResource} 集合。
+	 * 主要作用：避免资源的重复加载。
 	 */
 	private final ThreadLocal<Set<EncodedResource>> resourcesCurrentlyBeingLoaded =
 			new NamedThreadLocal<>("XML bean definition resources currently being loaded");
@@ -465,14 +466,20 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #detectValidationMode
 	 */
 	protected int getValidationModeForResource(Resource resource) {
+		// 获取指定的验证模式
 		int validationModeToUse = getValidationMode();
+		// 如果不是自动验证模式，直接返回
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
 		}
+		// 自动验证模式：
+		// 如果文件具有DOCTYPE定义，则使用DTD验证，否则假设XSD验证。
 		int detectedMode = detectValidationMode(resource);
+		// 如果不是自动验证模式，直接返回
 		if (detectedMode != VALIDATION_AUTO) {
 			return detectedMode;
 		}
+		// 如果仍然是自动验证模式，则使用默认验证模式：XSD
 		// Hmm, we didn't get a clear indication... Let's assume XSD,
 		// since apparently no DTD declaration has been found up until
 		// detection stopped (before finding the document's root tag).
@@ -480,6 +487,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
+	 * 检测要对所提供的资源标识的XML文件执行哪种验证。如果文件具有DOCTYPE定义，则使用DTD验证，否则假设XSD验证。
+	 * 如果您想自定义VALIDATION_AUTO模式的解析，请覆盖此方法。
+	 *
+	 * 该方法将自动检测验证模式的工作委托给了专门的处理类XmlValidationModeDetector。
+	 *
 	 * Detect which kind of validation to perform on the XML file identified
 	 * by the supplied {@link Resource}. If the file has a {@code DOCTYPE}
 	 * definition then DTD validation is used otherwise XSD validation is assumed.
@@ -487,6 +499,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * of the {@link #VALIDATION_AUTO} mode.
 	 */
 	protected int detectValidationMode(Resource resource) {
+		// 资源不可读，抛出BeanDefinitionStoreException异常
 		if (resource.isOpen()) {
 			throw new BeanDefinitionStoreException(
 					"Passed-in Resource [" + resource + "] contains an open stream: " +
@@ -497,6 +510,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 		InputStream inputStream;
 		try {
+			// 通过资源获取 InputStream
 			inputStream = resource.getInputStream();
 		}
 		catch (IOException ex) {
@@ -507,6 +521,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 
 		try {
+			// 核心逻辑：委托给 XmlValidationModeDetector 来获取验证模式。
 			return this.validationModeDetector.detectValidationMode(inputStream);
 		}
 		catch (IOException ex) {

@@ -26,6 +26,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
+ * XML 验证模式探测器。
+ * 自动获取验证模式，DTO 获取 XSD
+ *
  * Detects whether an XML stream is using DTD- or XSD-based validation.
  *
  * @author Rob Harrop
@@ -89,27 +92,37 @@ public class XmlValidationModeDetector {
 	 */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
 		// Peek into the file to look for DOCTYPE.
+		// 将 inputStream 封装成 BufferedReader
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		try {
+			// // 是否为 DTD 校验模式。默认为 XSD 模式
 			boolean isDtdValidated = false;
 			String content;
+			// 循环读取文件内容
 			while ((content = reader.readLine()) != null) {
+				// 清除一行上的所有注释内容，并返回剩余内容。
 				content = consumeCommentTokens(content);
+				// 如果该行内容是注释或者，content为空，跳过，读下一行
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// 如果内容包含 DOCTYPE 则为 DTO 模式
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				// 内容不包含 DOCTYPE
+				// 并且 这一行包含 < ，并且 < 紧跟着的是字母，则为 XSD 验证模式
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
 				}
 			}
+			// 返回相应的模式
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
+			// 如果发生异常，返回自动模式
 			// Choked on some character encoding...
 			// Leave the decision up to the caller.
 			return VALIDATION_AUTO;
@@ -133,15 +146,23 @@ public class XmlValidationModeDetector {
 	 * tokens will have consumed for the supplied content before passing the remainder to this method.
 	 */
 	private boolean hasOpeningTag(String content) {
+		// 如果该行内容是注释，直接返回false
 		if (this.inComment) {
 			return false;
 		}
 		int openTagIndex = content.indexOf('<');
+		// openTagIndex > -1：'<' 存在
+		// content.length() > openTagIndex + 1 ： 表示 '<' 后面还有其他内容
+		// Character.isLetter(content.charAt(openTagIndex + 1))：表示 '<' 后面的内容是字母
+		// 上面上个条件全部满足，返回true，有一个不满足 返回false
 		return (openTagIndex > -1 && (content.length() > openTagIndex + 1) &&
 				Character.isLetter(content.charAt(openTagIndex + 1)));
 	}
 
 	/**
+	 * 清除一行上的所有注释内容，并返回剩余内容。
+	 *
+	 *
 	 * Consumes all the leading comment data in the given String and returns the remaining content, which
 	 * may be empty since the supplied content might be all comment data. For our purposes it is only important
 	 * to strip leading comment content on a line since the first piece of non comment content will be either
@@ -149,10 +170,12 @@ public class XmlValidationModeDetector {
 	 */
 	@Nullable
 	private String consumeCommentTokens(String line) {
+		// 如果该行不包含 '<'，并且也不包含 '>'，直接返回。
 		if (!line.contains(START_COMMENT) && !line.contains(END_COMMENT)) {
 			return line;
 		}
 		String currLine = line;
+		// 该行包含 '<'， 或者'>'
 		while ((currLine = consume(currLine)) != null) {
 			if (!this.inComment && !currLine.trim().startsWith(START_COMMENT)) {
 				return currLine;
