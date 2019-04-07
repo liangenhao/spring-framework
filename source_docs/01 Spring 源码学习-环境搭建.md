@@ -29,6 +29,8 @@ java.lang.AbstractMethodError: org.jetbrains.plugins.gradle.tooling.util.ModuleC
 
 由于 IDEA 默认使用最新的 gradle，而 IntelliJ IDEA 2018.2 和 现在最新版本的 gradle 不兼容，所以，重新下载较低版本的 gradle 4.10.3 ，并配置 IntelIiJ IDEA -> Preferences -> Build,Execution, Deployment -> Build Tools -> Gradle，勾选`Use local gradle distribution`，并指定自己下载的`Gradle home`。
 
+![IDEA gradle 配置](images/IDEA gradle 配置.png)
+
 ### cglib 和 obienesis 的编译错误（并未遇到）
 
 根据《Spring源码深度解析 第2版》书中描述，Spring 把 最新的 cglib 和 objenesis 给重新打包了，源码中并没有提供，会出现编译报错。但我实际导入过程中，在gradle build 之后，这两个包已经被下载了，所以并没有遇到这种情况。

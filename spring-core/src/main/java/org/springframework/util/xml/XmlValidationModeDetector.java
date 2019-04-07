@@ -170,17 +170,20 @@ public class XmlValidationModeDetector {
 	 */
 	@Nullable
 	private String consumeCommentTokens(String line) {
-		// 如果该行不包含 '<'，并且也不包含 '>'，直接返回。
+		// 如果该行不包含 '<!--'，并且也不包含 '-->'，直接返回。
 		if (!line.contains(START_COMMENT) && !line.contains(END_COMMENT)) {
 			return line;
 		}
 		String currLine = line;
-		// 该行包含 '<'， 或者'>'
+		// 该行包含 '<!--'， 或者'-->'，执行 consume
 		while ((currLine = consume(currLine)) != null) {
+			// currLine返回的是'<!--'后的内容，或者'-->'后的内容
+			// 如果内容不是注释，并且当前行不以'<!--'开头，直接返回内容
 			if (!this.inComment && !currLine.trim().startsWith(START_COMMENT)) {
 				return currLine;
 			}
 		}
+		// 若该行内容是注释行，返回null
 		return null;
 	}
 
@@ -190,6 +193,10 @@ public class XmlValidationModeDetector {
 	 */
 	@Nullable
 	private String consume(String line) {
+		// 一开始，inComment == false，执行startComment方法，inComment变成true，返回的index是'<!--'后一个内容的索引，最后返回的是'<!--'后的内容
+		// 再次循环时，inComment == true, 执行endComment方法，
+		// 		如果不存在'-->'，返回-1，最终返回null，则该行就会被忽略掉
+		// 		如果存在'-->'，inComment变成false，返回的是'-->'后一个内容的索引值，最后返回的是'-->'后的内容，内容有可能是空的
 		int index = (this.inComment ? endComment(line) : startComment(line));
 		return (index == -1 ? null : line.substring(index));
 	}
@@ -199,10 +206,12 @@ public class XmlValidationModeDetector {
 	 * @see #commentToken(String, String, boolean)
 	 */
 	private int startComment(String line) {
+		// 如果存在 <!--'，返回的是'<!--'后一个内容的索引值，否则返回-1
 		return commentToken(line, START_COMMENT, true);
 	}
 
 	private int endComment(String line) {
+		// 如果存在'-->'，返回的是 '-->'后一个内容的索引值，否则返回-1
 		return commentToken(line, END_COMMENT, false);
 	}
 
@@ -212,10 +221,18 @@ public class XmlValidationModeDetector {
 	 * which is after the token or -1 if the token is not found.
 	 */
 	private int commentToken(String line, String token, boolean inCommentIfPresent) {
+		// 获取 '<!--' 或者 '-->' 的索引值
+		// 该索引值，是'<!--' 或者 '-->'第一个字符的位置
 		int index = line.indexOf(token);
+		// 索引值大于 -1 ，说明存在，设置 inComment
 		if (index > - 1) {
 			this.inComment = inCommentIfPresent;
 		}
+		// 如果索引值为-1，返回-1，否则，返回索引值 + token长度
+		// 返回 -1 ：表示不存在注释
+		// index + token.length()：
+		// 		'<!--' : 返回的是'<!--'后一个内容的索引值
+		//      '-->' : 返回的是 '-->'后一个内容的索引值
 		return (index == -1 ? index : index + token.length());
 	}
 
