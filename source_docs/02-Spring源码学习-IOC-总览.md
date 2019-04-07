@@ -15,7 +15,7 @@ tags: [Spring]
 
 **`DefaultListableBeanFactory` 是整个bean加载的核心部分，是 Spring 注册及加载 bean 的默认实现。**
 
-![](images/容器加载相关类图.png)
+![容器加载相关类图](images/容器加载相关类图.png)
 
 > 类图中各个类的作用，可看《Spring源码深度解析 第2版》P24-25。
 
@@ -49,11 +49,11 @@ reader.loadBeanDefinitions(resource); // 4
 
 1. 资源定位，通常用外部资源（配置文件）来描述bean对象，因此是首先定位到外部这个资源（Resource）。
 
-   > 详见： <a href="./03 Spring 源码学习-IOC-资源定位.md">Spring 源码学习-IOC-资源定位</a>
+   > 详见： [Spring源码学习-IOC-资源定位](03-Spring源码学习-IOC-资源定位.md)
 
 2. 装载，就是 `BeanDefinition` 的载入。使用`BeanDefinitionReader`读取解析`Resource`资源，将bean表示成`BeanDefinition `。
 
-   > 详见： <a href="./04 Spring 源码学习-IOC-资源装载.md">Spring 源码学习-IOC-资源装载</a>
+   > 详见： [Spring源码学习-IOC-资源装载](04-Spring源码学习-IOC-资源装载.md)
 
    - 在 IoC 容器内部维护着一个 `BeanDefinition` Map 的数据结构。
    - 在配置文件中每一个 `<bean>` 都对应着一个 `BeanDefinition` 对象。
