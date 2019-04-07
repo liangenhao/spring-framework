@@ -29,7 +29,7 @@ java.lang.AbstractMethodError: org.jetbrains.plugins.gradle.tooling.util.ModuleC
 
 由于 IDEA 默认使用最新的 gradle，而 IntelliJ IDEA 2018.2 和 现在最新版本的 gradle 不兼容，所以，重新下载较低版本的 gradle 4.10.3 ，并配置 IntelIiJ IDEA -> Preferences -> Build,Execution, Deployment -> Build Tools -> Gradle，勾选`Use local gradle distribution`，并指定自己下载的`Gradle home`。
 
-![IDEA gradle 配置](images/IDEA gradle 配置.png)
+![IDEA-gradle配置](images/IDEA-gradle配置.png)
 
 ### cglib 和 obienesis 的编译错误（并未遇到）
 
