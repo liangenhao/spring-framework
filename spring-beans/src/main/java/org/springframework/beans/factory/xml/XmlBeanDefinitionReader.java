@@ -264,16 +264,20 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * if none specified.
 	 */
 	protected EntityResolver getEntityResolver() {
+		// 如果没有设置过entityResolver，使用默认的entityResolver
 		if (this.entityResolver == null) {
 			// Determine default EntityResolver to use.
 			ResourceLoader resourceLoader = getResourceLoader();
+			// ResourceLoader不为null，创建一个ResourceEntityResolver
 			if (resourceLoader != null) {
 				this.entityResolver = new ResourceEntityResolver(resourceLoader);
 			}
+			// ResourceLoader为null，创建一个DelegatingEntityResolver
 			else {
 				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
 			}
 		}
+		// 如果设置过entityResolver，直接返回，否则使用默认的entityResolver
 		return this.entityResolver;
 	}
 

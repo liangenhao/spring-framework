@@ -35,6 +35,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * EntityResolver实现，将schema URLs解析为本地类路径资源。
+ * 默认情况下，此类将使用以下模式在类路径中查找映射文件：META-INF/spring.schemas，允许任何时候在类路径上存在多个文件。
+ * META-INF/spring.schemas的格式是一个属性文件，其中每一行的格式应为systemId = schema-location，
+ * 其中schema-location也应该是类路径中的模式文件。
+ * 可以使用PluggableSchemaResolver（ClassLoader，String）构造函数覆盖映射文件的模式。
+ *
  * {@link EntityResolver} implementation that attempts to resolve schema URLs into
  * local {@link ClassPathResource classpath resources} using a set of mappings files.
  *
@@ -111,13 +117,18 @@ public class PluggableSchemaResolver implements EntityResolver {
 			logger.trace("Trying to resolve XML entity with public id [" + publicId +
 					"] and system id [" + systemId + "]");
 		}
-
+		// XSD模式，publicId == null，这里只需要判断systemId
 		if (systemId != null) {
+			// 读取schema映射属性文件，默认的是META-INF/spring.schemas
+			// 找到systemId对应的resourceLocation
 			String resourceLocation = getSchemaMappings().get(systemId);
+			// 如果resourceLocation没找到，并且systemId以https:开头，将 https: 换成 http: 重新找一遍
 			if (resourceLocation == null && systemId.startsWith("https:")) {
 				// Retrieve canonical http schema mapping even for https declaration
 				resourceLocation = getSchemaMappings().get("http:" + systemId.substring(6));
 			}
+			// 找到了resourceLocation
+			// 和 BeansDtdResolver 一样，从classpath下加载文件
 			if (resourceLocation != null) {
 				Resource resource = new ClassPathResource(resourceLocation, this.classLoader);
 				try {
@@ -146,6 +157,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 */
 	private Map<String, String> getSchemaMappings() {
 		Map<String, String> schemaMappings = this.schemaMappings;
+		// // 双重检查锁，实现 schemaMappings 单例
 		if (schemaMappings == null) {
 			synchronized (this) {
 				schemaMappings = this.schemaMappings;
@@ -154,6 +166,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 						logger.trace("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
 					}
 					try {
+						// 读取schema映射属性文件，默认的是META-INF/spring.schemas
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
 						if (logger.isTraceEnabled()) {

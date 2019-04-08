@@ -29,6 +29,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
+ * 用于Spring bean DTD的{@link EntityResolver}实现，
+ * 以便从Spring类路径(或JAR文件)加载DTD。
+ *
+ * 从类路径资源“/org/springframework/beans/factory/xml/spring-beans.dtd”获取“spring-beans.dtd”，
+ * 无论是否指定为DTD中包含“spring-beans”的某些本地URL名称或“https://www.springframew
+ *
  * {@link EntityResolver} implementation for the Spring beans DTD,
  * to load the DTD from the Spring class path (or JAR file).
  *
@@ -58,17 +64,22 @@ public class BeansDtdResolver implements EntityResolver {
 			logger.trace("Trying to resolve XML entity with public ID [" + publicId +
 					"] and system ID [" + systemId + "]");
 		}
-
+		// systemId 以 '.dtd' 结尾
 		if (systemId != null && systemId.endsWith(DTD_EXTENSION)) {
 			int lastPathSeparator = systemId.lastIndexOf('/');
+			// 获取到DTD文件名称的索引值
 			int dtdNameStart = systemId.indexOf(DTD_NAME, lastPathSeparator);
+			// 存在
 			if (dtdNameStart != -1) {
+				// 拼接文件名: spring-beans.dtd
 				String dtdFile = DTD_NAME + DTD_EXTENSION;
 				if (logger.isTraceEnabled()) {
 					logger.trace("Trying to locate [" + dtdFile + "] in Spring jar on classpath");
 				}
 				try {
+					// 通过 ClassPathResource 在当前 classpath 下加载
 					Resource resource = new ClassPathResource(dtdFile, getClass());
+					// 将加载的资源包转成InputSource，并返回
 					InputSource source = new InputSource(resource.getInputStream());
 					source.setPublicId(publicId);
 					source.setSystemId(systemId);

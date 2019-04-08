@@ -24,7 +24,7 @@ IOC容器使用的第二个步骤：资源装载。
 
 **最核心方法：`org.springframework.beans.factory.support.BeanDefinitionReader#loadBeanDefinitions(org.springframework.core.io.Resource)`**
 
-![BeanDefinitionReader相关类图](images/BeanDefinitionReader相关类图.png)
+![BeanDefinitionReader相关类图](images/配置文件读取相关类图.png)
 
 
 
@@ -46,7 +46,7 @@ IOC容器使用的第二个步骤：资源装载。
 
 #### loadBeanDefinitions 方法解析
 
-会看[Spring 源码学习-IOC-总览](02 Spring 源码学习-IOC-总览.md)中的案例，代码最终调用了`reader.loadBeanDefinitions(resource);`来加载`BeanDefinition`。
+回看[Spring 源码学习-IOC-总览](02-Spring源码学习-IOC-总览.md)中的案例，代码最终调用了`reader.loadBeanDefinitions(resource);`来加载`BeanDefinition`。
 
 ##### loadBeanDefinitions
 
@@ -177,12 +177,12 @@ public int registerBeanDefinitions(Document doc, Resource resource) throws BeanD
 > 1. 加载xml文件，得到`Document`对象。
 > 2. 根据`Document`对象，注册Bean信息。
 
-###### 第一步：doLoadDocument - 获取 Document 对象
+###### 第一步：doLoadDocument-获取Document对象
 
 1. `getValidationModeForResource()`方法，用来做xml的验证模式：详见 [获取XML验证模式](04.1-Spring源码学习-IOC-资源装载-获取XML验证模式.md)
 2. `loadDocument()`方法，用来获取Document对象：详见 [获取Document对象](04.2-Spring源码学习-IOC-资源装载-获取Document对象.md)
 
-###### 第二步：registerBeanDefinitions - 注册 BeanDefinition
+###### 第二步：registerBeanDefinitions-注册BeanDefinition
 
 1. `registerBeanDefinitions()`方法，用来注册 BeanDefinition：详见 [注册BeanDefinition](04.3-Spring源码学习-IOC-资源装载-注册BeanDefinition.md)
 

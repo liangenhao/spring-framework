@@ -31,6 +31,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.xml.XmlValidationModeDetector;
 
 /**
+ * {@link DocumentLoader} 的默认实现。
+ *
+ * 使用标准的jaxp配置的XML解析器加载文档。
+ *
  * Spring's default {@link DocumentLoader} implementation.
  *
  * <p>Simply loads {@link Document documents} using the standard JAXP-configured
@@ -62,22 +66,28 @@ public class DefaultDocumentLoader implements DocumentLoader {
 
 
 	/**
+	 * 标准的jaxp（Java API for XMLProcessing）配置的XML解析器加载 {@link Document}
+	 *
 	 * Load the {@link Document} at the supplied {@link InputSource} using the standard JAXP-configured
 	 * XML parser.
 	 */
 	@Override
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
-
+		// 1. 获取 DocumentBuilderFactory 对象
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		// 2. 使用 DocumentBuilderFactory 创建 DocumentBuilder 对象
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		// 3. 通过 DocumentBuilder 来解析
 		return builder.parse(inputSource);
 	}
 
 	/**
+	 * 创建 {@link DocumentBuilderFactory} 对象
+	 *
 	 * Create the {@link DocumentBuilderFactory} instance.
 	 * @param validationMode the type of validation: {@link XmlValidationModeDetector#VALIDATION_DTD DTD}
 	 * or {@link XmlValidationModeDetector#VALIDATION_XSD XSD})
@@ -87,16 +97,21 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	 */
 	protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
 			throws ParserConfigurationException {
-
+		// 创建 DocumentBuilderFactory 对象
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		// 设置命名空间支持
 		factory.setNamespaceAware(namespaceAware);
 
 		if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
+			// 开启校验
 			factory.setValidating(true);
+
 			if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
+				// 如果是XSD校验模式，设置命名空间支持
 				// Enforce namespace aware for XSD...
 				factory.setNamespaceAware(true);
 				try {
+					// 设置SCHEMA_LANGUAGE_ATTRIBUTE
 					factory.setAttribute(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
 				}
 				catch (IllegalArgumentException ex) {
@@ -114,6 +129,8 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	}
 
 	/**
+	 * 创建 {@link DocumentBuilder} 对象。
+	 *
 	 * Create a JAXP DocumentBuilder that this bean definition reader
 	 * will use for parsing XML documents. Can be overridden in subclasses,
 	 * adding further initialization of the builder.
@@ -127,12 +144,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	protected DocumentBuilder createDocumentBuilder(DocumentBuilderFactory factory,
 			@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)
 			throws ParserConfigurationException {
-
+		// 通过工厂创建 DocumentBuilder 对象
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
 		if (entityResolver != null) {
+			// 设置 EntityResolver
 			docBuilder.setEntityResolver(entityResolver);
 		}
 		if (errorHandler != null) {
+			// 设置错误处理器
 			docBuilder.setErrorHandler(errorHandler);
 		}
 		return docBuilder;

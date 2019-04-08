@@ -26,6 +26,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * {@link EntityResolver} 的实现类。
+ * 该类不会自己处理，而是会根据 systemId 判断，委托给{@link BeansDtdResolver}或者{@link PluggableSchemaResolver}处理
+ *
  * {@link EntityResolver} implementation that delegates to a {@link BeansDtdResolver}
  * and a {@link PluggableSchemaResolver} for DTDs and XML schemas, respectively.
  *
@@ -83,9 +86,11 @@ public class DelegatingEntityResolver implements EntityResolver {
 			throws SAXException, IOException {
 
 		if (systemId != null) {
+			// 如果 systemId 以 .dtd 结尾，使用dtdResolver，默认为 BeansDtdResolver
 			if (systemId.endsWith(DTD_SUFFIX)) {
 				return this.dtdResolver.resolveEntity(publicId, systemId);
 			}
+			// 如果 systemId 以 .xsd 结尾，使用schemaResolver，默认为 PluggableSchemaResolver
 			else if (systemId.endsWith(XSD_SUFFIX)) {
 				return this.schemaResolver.resolveEntity(publicId, systemId);
 			}

@@ -31,6 +31,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
 /**
+ * 尝试通过{@link org.springframework.core.io.ResourceLoader}解析实体引用的{@code EntityResolver}实现（通常，相对于{@code ApplicationContext}的资源库）（如果适用）。
+ * 扩展{@link DelegatingEntityResolver} 以提供DTD和XSD查找。
+ *
  * {@code EntityResolver} implementation that tries to resolve entity references
  * through a {@link org.springframework.core.io.ResourceLoader} (usually,
  * relative to the resource base of an {@code ApplicationContext}), if applicable.
@@ -74,16 +77,21 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
-
+		// 调用 DelegatingEntityResolver#resolveEntity 方法
 		InputSource source = super.resolveEntity(publicId, systemId);
-
+		// DelegatingEntityResolver#resolveEntity 解析失败
+		// 使用resourceLoader解析
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {
+				// 使用 utf-8 解码 systemId
 				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
+				// 将解码后的systemId，转成URL字符串
 				String givenUrl = new URL(decodedSystemId).toString();
+				// 解析文件资源的相对路径（相对于系统根路径）
 				String systemRootUrl = new File("").toURI().toURL().toString();
 				// Try relative to resource base if currently in system root.
+				// 如果资源路径是当前系统根路径下的资源，则截取资源路径
 				if (givenUrl.startsWith(systemRootUrl)) {
 					resourcePath = givenUrl.substring(systemRootUrl.length());
 				}
@@ -100,7 +108,9 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Trying to locate XML entity [" + systemId + "] as resource [" + resourcePath + "]");
 				}
+				// 通过resourceLoader获取资源
 				Resource resource = this.resourceLoader.getResource(resourcePath);
+				// 将InputStream封装成InputSource
 				source = new InputSource(resource.getInputStream());
 				source.setPublicId(publicId);
 				source.setSystemId(systemId);
@@ -108,13 +118,17 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 					logger.debug("Found XML entity [" + systemId + "]: " + resource);
 				}
 			}
+			// resourcePath == null，并且 systemId以.dtd结尾或者.xsd结尾
+			// 		resourcePath == null，表示resourcePath不是当前系统根路径下的资源
 			else if (systemId.endsWith(DTD_SUFFIX) || systemId.endsWith(XSD_SUFFIX)) {
 				// External dtd/xsd lookup via https even for canonical http declaration
 				String url = systemId;
+				// 如果 systemId 以 http:开头，换成 https:
 				if (url.startsWith("http:")) {
 					url = "https:" + url.substring(5);
 				}
 				try {
+					// 通过 URL获取资源流，最后封装成InputSource
 					source = new InputSource(new URL(url).openStream());
 					source.setPublicId(publicId);
 					source.setSystemId(systemId);
