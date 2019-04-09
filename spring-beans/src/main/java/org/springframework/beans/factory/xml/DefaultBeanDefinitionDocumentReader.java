@@ -40,6 +40,12 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * BeanDefinitionDocumentReader接口的默认实现，
+ * 它根据“spring-beans”DTD和XSD格式（Spring的默认XML bean定义格式）读取bean定义。
+ * 所需XML文档的结构，元素和属性名称在此类中是硬编码的。
+ * （当然，如果有必要，可以运行转换来生成这种格式）。
+ * {@code <beans>}不需要是XML文档的根元素：此类将解析XML文件中的所有bean定义元素，而不管实际的根元素。
+ *
  * Default implementation of the {@link BeanDefinitionDocumentReader} interface that
  * reads bean definitions according to the "spring-beans" DTD and XSD format
  * (Spring's default XML bean definition format).
@@ -93,6 +99,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
+		// 获取 Document 的 root element
+		// 注册 BeanDefinitions
 		doRegisterBeanDefinitions(doc.getDocumentElement());
 	}
 
@@ -125,16 +133,22 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// the new (child) delegate with a reference to the parent for fallback purposes,
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
+		// 记录老的 BeanDefinitionParserDelegate 对象
 		BeanDefinitionParserDelegate parent = this.delegate;
+		// 创建 BeanDefinitionParserDelegate 对象，并进行设置到 delegate
 		this.delegate = createDelegate(getReaderContext(), root, parent);
-
+		// 检测 <beans /> 根标签的命名空间是否是默认的命名空间
+		// 默认命名空间：命名空间为空或者是http://www.springframework.org/schema/beans
 		if (this.delegate.isDefaultNamespace(root)) {
+			// 处理 profile 属性
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
+				// 使用分隔符切分，可能有多个 profile 。
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 				// We cannot use Profiles.of(...) since profile expressions are not supported
 				// in XML config. See SPR-12458 for details.
+				// 如果所有 profile 都无效，则不进行注册
 				if (!getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipped XML bean definition file due to specified profiles [" + profileSpec +
@@ -144,11 +158,14 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				}
 			}
 		}
-
+		// 解析前处理，空实现，由子类实现
 		preProcessXml(root);
+		// 解析
 		parseBeanDefinitions(root, this.delegate);
+		// 解析后处理，空实现，由子类实现
 		postProcessXml(root);
 
+		// 设置 delegate 回老的 BeanDefinitionParserDelegate 对象
 		this.delegate = parent;
 	}
 
@@ -166,36 +183,52 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+		// // 默认命名空间：命名空间为空或者是http://www.springframework.org/schema/beans
 		if (delegate.isDefaultNamespace(root)) {
+			// 根节点的命名空间是默认的命名空间
+			// 获取根节点下的子节点
 			NodeList nl = root.getChildNodes();
+			// 遍历
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						// 如果该节点使用默认命名空间，执行默认解析
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						// 如果该节点非默认命名空间，执行自定义解析
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		}
 		else {
+			// 根节点的命名空间不是默认的命名空间，执行自定义解析
 			delegate.parseCustomElement(root);
 		}
 	}
 
+	/**
+	 * 默认解析
+	 * @param ele
+	 * @param delegate
+	 */
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
+		// 对 import 标签处理
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			importBeanDefinitionResource(ele);
 		}
+		// 对 alias 标签处理
 		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
 			processAliasRegistration(ele);
 		}
+		// 对 bean 标签处理
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
 			processBeanDefinition(ele, delegate);
 		}
+		// 对 beans 标签处理
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
 			// recurse
 			doRegisterBeanDefinitions(ele);
