@@ -33,6 +33,10 @@ import org.springframework.util.ResourceUtils;
 public abstract class ResourcePatternUtils {
 
 	/**
+	 * 判断资源路径是否是URL
+	 * - 资源路径以 classpath: 或 classpath*: 开头，是URL
+	 * - 否则，尝试封装成URL对象，如果成功，则是URL，如果抛出异常，则不是
+	 *
 	 * Return whether the given resource location is a URL: either a
 	 * special "classpath" or "classpath*" pseudo URL or a standard URL.
 	 * @param resourceLocation the location String to check

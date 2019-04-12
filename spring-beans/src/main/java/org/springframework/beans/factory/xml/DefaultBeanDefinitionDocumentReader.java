@@ -240,20 +240,28 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * from the given resource into the bean factory.
 	 */
 	protected void importBeanDefinitionResource(Element ele) {
+		// 获取 import 标签的 resource 属性的值
 		String location = ele.getAttribute(RESOURCE_ATTRIBUTE);
+		// 如果该值为空，不做任何处理
 		if (!StringUtils.hasText(location)) {
 			getReaderContext().error("Resource location must not be empty", ele);
 			return;
 		}
 
 		// Resolve system properties: e.g. "${user.dir}"
+		// 解析系统属性，格式：${user.dir}
 		location = getReaderContext().getEnvironment().resolveRequiredPlaceholders(location);
 
+		// 实际 Resource 集合，即 import 的地址，有哪些 Resource 资源
 		Set<Resource> actualResources = new LinkedHashSet<>(4);
 
 		// Discover whether the location is an absolute or relative URI
 		boolean absoluteLocation = false;
 		try {
+			// 判断 location 是绝对路径还是相对路径
+			// 1. 以 classpath: 或 classpath:* 开头是绝对路径
+			// 2. 能够封装成URL对象的是绝对路径
+			// 3. 封装成URI对象，通过isAbsolute是否是绝对路径
 			absoluteLocation = ResourcePatternUtils.isUrl(location) || ResourceUtils.toURI(location).isAbsolute();
 		}
 		catch (URISyntaxException ex) {
@@ -263,7 +271,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		// Absolute or relative?
 		if (absoluteLocation) {
+			// 如果是绝对路径，则根据地址加载出配置文件
 			try {
+				// 使用 XmlBeanDefinitionReader 加载绝对路径资源的beanDefinition
 				int importCount = getReaderContext().getReader().loadBeanDefinitions(location, actualResources);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Imported " + importCount + " bean definitions from URL location [" + location + "]");
@@ -275,16 +285,26 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 		else {
+			// // 如果是相对路径，则根据相对路径计算出绝对路径
 			// No URL -> considering resource location as relative to the current file.
 			try {
+
 				int importCount;
+				// 创建相对地址的 Resource
 				Resource relativeResource = getReaderContext().getResource().createRelative(location);
+				// 该相对地址资源存在
 				if (relativeResource.exists()) {
+					// 存在，则加载相对地址资源的 beanDefinition
 					importCount = getReaderContext().getReader().loadBeanDefinitions(relativeResource);
+					// 添加到 actualResources 中
 					actualResources.add(relativeResource);
 				}
+				// // 该相对地址资源不存在
 				else {
+					// 获取根路径地址
 					String baseLocation = getReaderContext().getResource().getURL().toString();
+					// StringUtils.applyRelativePath(baseLocation, location)：通过根路径和相对路径地址，构造一个绝对路径资源地址
+					// 添加配置文件地址的 Resource 到 actualResources 中，并加载相应的 BeanDefinition
 					importCount = getReaderContext().getReader().loadBeanDefinitions(
 							StringUtils.applyRelativePath(baseLocation, location), actualResources);
 				}
@@ -300,6 +320,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						"Failed to import bean definitions from relative location [" + location + "]", ele, ex);
 			}
 		}
+		// 解析成功后，进行监听器激活处理
 		Resource[] actResArray = actualResources.toArray(new Resource[0]);
 		getReaderContext().fireImportProcessed(location, actResArray, extractSource(ele));
 	}
@@ -336,11 +357,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+		// 委托 BeanDefinitionParserDelegate 的 parseBeanDefinitionElement 方法进行元素解析，返回 BeanDefinitionHolder 对象
+		// BeanDefinitionHolder 对象中包含了元素的各个属性了，例如 class、name、id、alias。。。
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
+			// 解析成功，若存在默认标签的字节点下再有自定义属性，还需要再次对自定义标签进行解析
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// Register the final decorated instance.
+				// 解析完成后，对 beanDefinition 进行注册，委托给 BeanDefinitionReaderUtils
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			}
 			catch (BeanDefinitionStoreException ex) {
@@ -348,6 +373,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
 			// Send registration event.
+			// 发出响应事件，通知相关的监听器，已完成该 Bean 标签的解析。
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}
