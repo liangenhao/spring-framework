@@ -52,19 +52,25 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
 		synchronized (this.aliasMap) {
+			// 如果 alias == name，则从 aliasMap 集合中删除该别名(alias)，并打印debug日志
 			if (alias.equals(name)) {
 				this.aliasMap.remove(alias);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Alias definition '" + alias + "' ignored since it points to same name");
 				}
 			}
+			// 如果 alias != name
 			else {
+				// 获取 alias 已注册的 beanName
 				String registeredName = this.aliasMap.get(alias);
 				if (registeredName != null) {
+					// 如果已注册的beanName和新的beanName相同，返回，无需注册
+					// 即：alias == alias, beanName == beanName ，则无需注册，直接返回
 					if (registeredName.equals(name)) {
 						// An existing alias - no need to re-register
 						return;
 					}
+					// 如果不允许覆盖，抛出异常
 					if (!allowAliasOverriding()) {
 						throw new IllegalStateException("Cannot define alias '" + alias + "' for name '" +
 								name + "': It is already registered for name '" + registeredName + "'.");
@@ -74,7 +80,10 @@ public class SimpleAliasRegistry implements AliasRegistry {
 								registeredName + "' with new target name '" + name + "'");
 					}
 				}
+				// 校验，是否存在循环指向
+				// 检查给定名称是否已指向另一个方向的别名作为别名
 				checkForAliasCircle(name, alias);
+				// 注册：存入 aliasMap 集合中
 				this.aliasMap.put(alias, name);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Alias definition '" + alias + "' registered for name '" + name + "'");
@@ -92,12 +101,29 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	/**
+	 * 确定给定名称是否已注册给定的别名
 	 * Determine whether the given name has the given alias registered.
 	 * @param name the name to check
 	 * @param alias the alias to look for
 	 * @since 4.2.1
 	 */
 	public boolean hasAlias(String name, String alias) {
+		/* 例子：
+			第一次进入：	alias - name
+
+				参数：	mtb - myTestBean
+				集合：
+						myTB - myTestBean
+						mtb - myTB
+			递归：
+				参数：	mtb - myTB
+				集合：
+						myTB - myTestBean
+						mtb - myTB
+		 */
+		// 可以查看 :http://heeexy.com/2017/09/15/spring_SimpleAliasRegistry/ 这篇文章
+		// 判断mtb是否已经做了myTestBean的别名
+		// 还判断了mtb是不是myTestBean的别名 的别名 的别名 的别名 的别名….最终能通过一条线导向myTestBean
 		for (Map.Entry<String, String> entry : this.aliasMap.entrySet()) {
 			String registeredName = entry.getValue();
 			if (registeredName.equals(name)) {
@@ -190,6 +216,8 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	/**
+	 * 检查给定名称是否已指向另一个方向的别名作为别名
+	 *
 	 * Check whether the given name points back to the given alias as an alias
 	 * in the other direction already, catching a circular reference upfront
 	 * and throwing a corresponding IllegalStateException.

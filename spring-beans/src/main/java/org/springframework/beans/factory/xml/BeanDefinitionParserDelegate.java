@@ -417,6 +417,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// 参数 containingBean 表示父类 bean
 		// 获取 bean 标签的 id 属性的值
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 		// 获取 bean 标签 name 属性的值
@@ -1403,6 +1404,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele, BeanDefinitionHolder definitionHolder) {
+		// 这里containingBd 表示 父类bean
 		return decorateBeanDefinitionIfRequired(ele, definitionHolder, null);
 	}
 
@@ -1413,16 +1415,20 @@ public class BeanDefinitionParserDelegate {
 
 		// Decorate based on custom attributes first.
 		NamedNodeMap attributes = ele.getAttributes();
+		// 编辑元素的所有属性，看看是否有适用于装饰的属性
 		for (int i = 0; i < attributes.getLength(); i++) {
 			Node node = attributes.item(i);
+			// 核心逻辑
 			finalDefinition = decorateIfRequired(node, finalDefinition, containingBd);
 		}
 
 		// Decorate based on custom nested elements.
 		NodeList children = ele.getChildNodes();
+		// 遍历所有的子元素，看看是否有适用于修饰的子元素
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				// 核心逻辑
 				finalDefinition = decorateIfRequired(node, finalDefinition, containingBd);
 			}
 		}
@@ -1431,13 +1437,20 @@ public class BeanDefinitionParserDelegate {
 
 	public BeanDefinitionHolder decorateIfRequired(
 			Node node, BeanDefinitionHolder originalDef, @Nullable BeanDefinition containingBd) {
-
+		// 获取自定义标签的命名空间
 		String namespaceUri = getNamespaceURI(node);
+		// 如果命名空间不是默认命名空间，则进行修饰
+		// 默认命名空间：为空 或者为 http://www.springframework.org/schema/beans
 		if (namespaceUri != null && !isDefaultNamespace(namespaceUri)) {
+			// 获取命名空间处理器对象：通过 DefaultNamespaceHandlerResolver 获取 NamespaceHandler 子类对象
+			// 命名空间处理器从 META-INF/spring.handlers 下获取并匹配
 			NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 			if (handler != null) {
+				// 成功获取命名空间处理器对象
+				// 核心逻辑：委托给命名空间处理器(NamespaceHandler)进行装饰
 				BeanDefinitionHolder decorated =
 						handler.decorate(node, originalDef, new ParserContext(this.readerContext, this, containingBd));
+				// 装饰成功，返回装饰后的 BeanDefinitionHolder 对象
 				if (decorated != null) {
 					return decorated;
 				}
@@ -1452,6 +1465,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 		}
+		// 装饰失败，返回原 BeanDefinitionHolder 对象
 		return originalDef;
 	}
 
