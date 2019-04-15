@@ -70,7 +70,9 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 获取对应的自定义 BeanDefinitionParser 对象
 		BeanDefinitionParser parser = findParserForElement(element, parserContext);
+		// 委托 BeanDefinitionParser 对象解析
 		return (parser != null ? parser.parse(element, parserContext) : null);
 	}
 
@@ -80,7 +82,12 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
+		// 获取 element 的 名称
+		// 例如：<context:component-scan />，则 localName 就是 component-scan
 		String localName = parserContext.getDelegate().getLocalName(element);
+		// 之前在获取 NamespaceHandler 对象时，调用init() 方法，将 BeanDefinitionParser 实现类注册到 parsers 中
+		// org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver.resolve
+		// 现在获取 element 对应的 BeanDefinitionParser 对象
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(

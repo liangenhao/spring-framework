@@ -1386,28 +1386,54 @@ public class BeanDefinitionParserDelegate {
 
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele) {
+		// containingBd：父bean
 		return parseCustomElement(ele, null);
 	}
 
+	/**
+	 * 解析自定义标签
+	 * @param ele
+	 * @param containingBd
+	 * @return
+	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		// 获取元素的命名空间
 		String namespaceUri = getNamespaceURI(ele);
+		// 命名空间为空，直接返回null。（为空的命名空间属于默认命名空间）
 		if (namespaceUri == null) {
 			return null;
 		}
+		// 使用 DefaultNamespaceHandlerResolver，根据命名空间获取对应的 NamespaceHandler 实现类
+		// 默认加载 META-INF/spring.handlers文件，从中找出对应的 NamespaceHandler 实现类
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
+		// 未获取到对应命名空间的 NamespaceHandler
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		// 通过 NamespaceHandler 解析自定义标签。
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
+	/**
+	 * 默认标签下的自定义标签的解析
+	 * @param ele
+	 * @param definitionHolder
+	 * @return
+	 */
 	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele, BeanDefinitionHolder definitionHolder) {
 		// 这里containingBd 表示 父类bean
 		return decorateBeanDefinitionIfRequired(ele, definitionHolder, null);
 	}
 
+	/**
+	 * 默认标签下的自定义标签的解析
+	 * @param ele
+	 * @param definitionHolder
+	 * @param containingBd
+	 * @return
+	 */
 	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(
 			Element ele, BeanDefinitionHolder definitionHolder, @Nullable BeanDefinition containingBd) {
 
