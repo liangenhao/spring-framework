@@ -29,7 +29,7 @@ Xml 配置文件读取是 Spring 中重要的功能，配置读取相关类图�
 
 ![配置文件读取相关类图](images/配置文件读取相关类图.png)
 
-## IOC 容器装载执行步骤
+## 容器初始化阶段
 
 使用`DefaultListableBeanFactory`和`XmlBeanDefinitionReader`使用IOC容器代码如下：
 
@@ -69,11 +69,32 @@ reader.loadBeanDefinitions(resource); // 4
 
 
 
-## bean的加载
+## 加载Bean阶段
 
-当对XML配置文件解析成`BeanDefinition`，并将`BeanDefinition`注册到`BeanDefinitionRegistry`后，就是bean如何加载。
+当对XML配置文件解析成`BeanDefinition`，并将`BeanDefinition`注册到`BeanDefinitionRegistry`后，初始化阶段完成，当我们显示或者隐式地调用 `BeanFactory#getBean(...)` 方法时，则会触发加载 Bean 阶段。
 
-TODO
+- 在这阶段，容器会首先检查所请求的对象是否已经初始化完成了，如果没有，则会根据注册的 Bean 信息实例化请求的对象，并为其注册依赖，然后将其返回给请求方。
+
+接着上一个阶段的案例：
+
+当容器初始化完成后，调用`BeanFactory#getBean(String name)`方法，触发加载Bean阶段。
+
+```java
+// 容器初始化阶段
+ClassPathResource resource = new ClassPathResource("bean.xml");
+BeanFactory factory = new DefaultListableBeanFactory();
+XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
+reader.loadBeanDefinitions(resource); 
+
+// 加载Bean阶段
+MyTestBean bean = (MyTestBean)factory.getBean("myTestBean");
+```
+
+[加载Bean](05-Spring源码学习-IOC-加载Bean.md)
+
+
+
+
 
 ## 容器的功能扩展
 

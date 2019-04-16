@@ -244,6 +244,9 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		// Handle aliasing...
 		String resolvedName;
 		do {
+			// 如果name是alias的话，取指定的 alias 所表示的最终 beanName 。
+			// 例如：别名A指向名称B，则返回B
+			// 例如：别名A指向别名B，别名B指向名称C，则返回C
 			resolvedName = this.aliasMap.get(canonicalName);
 			if (resolvedName != null) {
 				canonicalName = resolvedName;

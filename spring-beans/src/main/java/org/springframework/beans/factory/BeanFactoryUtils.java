@@ -72,6 +72,8 @@ public abstract class BeanFactoryUtils {
 	}
 
 	/**
+	 * 去除 FactoryBean 的修饰符 &
+	 *
 	 * Return the actual bean name, stripping out the factory dereference
 	 * prefix (if any, also stripping repeated factory prefixes if found).
 	 * @param name the name of the bean
@@ -80,11 +82,17 @@ public abstract class BeanFactoryUtils {
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
+		// name 不是以 & 开头，直接返回
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
+		// computeIfAbsent 方法，分成两种情况：
+		//      1. 未存在，则进行计算执行，并将结果添加到缓存、
+		//      2. 已存在，则直接返回，无需计算。
+		// transformedBeanNameCache 集合的存在，是为了缓存转换后的结果。下次再获取相同的 name 时，直接返回
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
+				// 取出 name 前的所有 & ，最终返回
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 			}
 			while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
