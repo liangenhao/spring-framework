@@ -13,8 +13,6 @@ MyTestBean bean = (MyTestBean)factory.getBean("myTestBean");
 
 `DefaultListableBeanFactory`的**`getBean(String)`方法的实现，来自于`AbstractBeanFactory`的默认实现。**
 
-
-
 ## AbstractBeanFactory#getBean(String)
 
 ```java

@@ -70,12 +70,24 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
+	/**
+	 * key : beanName ; value : bean的实例
+	 */
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
+	/**
+	 * key : beanName ; value : 创建bean的工厂
+	 */
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
+	/**
+	 * key : beanName ; value :  bean的实例
+	 * 和 singletonObjects 不同之处：当一个单例bean被放入earlySingletonObjects后，那么当bean还在创建过程中，
+	 * 就可以通过getBean方法获取到了，其目的是用来检测循环引用。
+	 * earlySingletonObjects 中存放的bean实例不一定完整。
+	 */
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
@@ -161,11 +173,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Override
 	@Nullable
 	public Object getSingleton(String beanName) {
+		// 第二个参数：allowEarlyReference 是否允许引用被提早创建（为了避免循环依赖）
 		return getSingleton(beanName, true);
 	}
 
 	/**
-	 * Return the (raw) singleton object registered under the given name.
+	 * Return the (RAW) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
 	 * @param beanName the name of the bean to look for
@@ -174,20 +187,31 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		// 从单例缓存中加载bean
+		// singletonObjects : 单例缓存
 		Object singletonObject = this.singletonObjects.get(beanName);
+		// 缓存中不存在当前bean 并且 当前的bean正在创建
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
+				// 从提早曝光的缓存中获取
 				singletonObject = this.earlySingletonObjects.get(beanName);
+				// 提早曝光的缓存中没有 并且 允许提早创建
 				if (singletonObject == null && allowEarlyReference) {
+					// 从 singletonFactories 中获取对应的 ObjectFactory
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						// 获得 bean
 						singletonObject = singletonFactory.getObject();
+						// 添加 bean 到 提早曝光的缓存 中
 						this.earlySingletonObjects.put(beanName, singletonObject);
+						// 从 singletonFactories 中移除对应的 ObjectFactory
 						this.singletonFactories.remove(beanName);
 					}
 				}
 			}
 		}
+		// 缓存中存在当前bean，直接返回
+		// 或者，缓存中不存在当前bean，当前bean也没有正在创建，直接返回 null
 		return singletonObject;
 	}
 
