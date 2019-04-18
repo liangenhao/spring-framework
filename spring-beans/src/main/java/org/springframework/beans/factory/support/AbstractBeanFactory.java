@@ -1707,7 +1707,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
-			// 如果 beanInstance 不是 FactoryBean 类型，则抛出异常
+			// 以&开头的bean，如果 beanInstance 不是 FactoryBean 类型，则抛出异常
 			if (!(beanInstance instanceof FactoryBean)) {
 				throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
 			}
@@ -1719,7 +1719,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// caller actually wants a reference to the factory.
 		// 如果不是FactoryBean，直接返回，不做处理
 		// 如果是FactoryBean，并且name 以 & 开头，表示想要获取的是工厂实例而不是工厂的GetObject()方法对应的实例，直接返回
-		// 这里可以看出，如果想获取工厂实例，name以&开头
+		//     这里可以看出，如果想获取工厂实例，name以&开头
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
 			return beanInstance;
 		}
