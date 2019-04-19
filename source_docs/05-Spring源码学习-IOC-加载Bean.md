@@ -21,7 +21,7 @@ public Object getBean(String name) throws BeansException {
   // name : 要获取的 bean 的名称
   // requiredType : 要获取 bean 的类型
   // args : 创建 Bean 时传递的参数。这个参数仅限于创建 Bean 时使用
-  // typeCheckOnly : 是否仅做类型检查，false：表示除了做类型检查，还要做些其他的事情
+  // typeCheckOnly : 表示是否为仅仅进行类型检查获取 Bean 对象。如果不是仅仅做类型检查，而是创建 Bean 对象，则需要调用 #markBeanAsCreated(String beanName) 方法，进行记录。
   return doGetBean(name, null, null, false);
 }
 protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
@@ -245,9 +245,31 @@ protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredTy
 
 ### 原型模式的依赖检查
 
+详见 [原型模式的依赖检查](05.3-Spring源码学习-IOC-加载Bean-原型模式的依赖检查.md)
+
+### 从parentBeanFactory中加载bean
+
+详见 [从parentBeanFactory中加载bean](05.4-Spring源码学习-IOC-加载Bean-从parentBeanFactory中加载bean.md)
+
+### typeCheckOnly
+
+详见 [typeCheckOnly](05.5-Spring源码学习-IOC-加载Bean-typeCheckOnly.md)
+
+### 获取RootBeanDefinition
+
+详见 [获取RootBeanDefinition](05.6-Spring源码学习-IOC-加载Bean-获取RootBeanDefinition.md)
+
+### 处理依赖
+
+详见 [处理依赖](05.7-Spring源码学习-IOC-加载Bean-处理依赖.md)
+
+### 实例化不同作用域的Bean
+
 TODO
 
+### 类型转换
 
+TODO
 
 ## 参考资料
 
