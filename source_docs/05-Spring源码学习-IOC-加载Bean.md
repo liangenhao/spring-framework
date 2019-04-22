@@ -265,11 +265,11 @@ protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredTy
 
 ### 实例化不同作用域的Bean
 
-TODO
+详见 [创建不同scope的Bean](05.8-Spring源码学习-IOC-加载Bean-创建不同scope的Bean.md)
 
 ### 类型转换
 
-TODO
+详见 [类型转换](05.9-Spring源码学习-IOC-加载Bean-类型转换.md)
 
 ## 参考资料
 
