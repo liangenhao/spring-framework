@@ -269,7 +269,11 @@ protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredTy
 
 ### 类型转换
 
-详见 [类型转换](05.9-Spring源码学习-IOC-加载Bean-类型转换.md)
+程序到这基本就结束了，通常该方法的调用参数`requiredType`为空，直接返回的是Object对象。
+
+当`requiredType`不是空，并且符合bean的实际类型，就需要执行类型转换了，转换成`requiredType`所指定的类型。
+
+在Spring中提供了各种各样的转换器，用户也可以自己扩展转换器来满足需求 。
 
 ## 参考资料
 
