@@ -9,6 +9,12 @@ tags: [Spring]
 
 ## 命名
 
+【形容词 + 名词】：
+
+`DefaultListableBeanFactory`
+
+`ConfigurableListableBeanFactory`：`Configurable`：可配置的，即表示可修改，所以一般有该名称的类里都有`set*`方法或者`add*`方法。
+
 
 
 ## 方法

@@ -100,6 +100,9 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
 		// factoryBean 为 单例，并且缓存singletonObjects 中存在
 		if (factory.isSingleton() && containsSingleton(beanName)) {
+			// 这里为什么要加锁？
+			// factoryBeanObjectCache本身是ConcurrentHashMap，线程安全。
+			// 它单独get/put时是安全的。但同时有这两个操作就需要保证原子性。
 			synchronized (getSingletonMutex()) { // 单例锁
 				// 从 缓存 中 获取指定的 factoryBean对应的Bean实例
 				Object object = this.factoryBeanObjectCache.get(beanName);

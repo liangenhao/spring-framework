@@ -168,8 +168,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
+				// 单例缓存中不存在 beanName
+				// 添加ObjectFactory到singletonFactories
 				this.singletonFactories.put(beanName, singletonFactory);
+				// 从提早曝光中删除
 				this.earlySingletonObjects.remove(beanName);
+				// 添加到registeredSingletons
 				this.registeredSingletons.add(beanName);
 			}
 		}

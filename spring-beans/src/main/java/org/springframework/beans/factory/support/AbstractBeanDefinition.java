@@ -638,6 +638,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #AUTOWIRE_BY_TYPE
 	 */
 	public int getResolvedAutowireMode() {
+		// 自动检测模式，已过时
 		if (this.autowireMode == AUTOWIRE_AUTODETECT) {
 			// Work out whether to apply setter autowiring or constructor autowiring.
 			// If it has a no-arg constructor it's deemed to be setter autowiring,
@@ -651,6 +652,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 			return AUTOWIRE_CONSTRUCTOR;
 		}
 		else {
+			// 非自动检测模式，直接返回
 			return this.autowireMode;
 		}
 	}
