@@ -175,9 +175,9 @@ Spring的bean的scope=prototype
 
 ## 策略模式
 
-TODO
+【bean实例化策略】：
 
-
+详见 [创建Bean的实例](05.8.2-Spring源码学习-IOC-加载Bean-创建Bean-创建Bean的实例.md) 中的实例化策略。
 
 ## 代理模式
 

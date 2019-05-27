@@ -293,8 +293,10 @@ public class BeanDefinitionVisitor {
 			throw new IllegalStateException("No StringValueResolver specified - pass a resolver " +
 					"object into the constructor or override the 'resolveStringValue' method");
 		}
+		// 解析真值
 		String resolvedValue = this.valueResolver.resolveStringValue(strVal);
 		// Return original String if not modified.
+		// 如果原始的字符串没有被修改，返回原始值
 		return (strVal.equals(resolvedValue) ? strVal : resolvedValue);
 	}
 
