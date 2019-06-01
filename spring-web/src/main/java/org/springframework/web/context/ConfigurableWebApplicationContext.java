@@ -53,6 +53,7 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 
 
 	/**
+	 * 为 ApplicationContext 添加 Servlet 上下文
 	 * Set the ServletContext for this web application context.
 	 * <p>Does not cause an initialization of the context: refresh needs to be
 	 * called after the setting of all configuration properties.
@@ -61,6 +62,8 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	void setServletContext(@Nullable ServletContext servletContext);
 
 	/**
+	 * 为 ApplicationContext 添加 Servlet 配置
+	 *
 	 * Set the ServletConfig for this web application context.
 	 * Only called for a WebApplicationContext that belongs to a specific Servlet.
 	 * @see #refresh()
@@ -68,12 +71,16 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	void setServletConfig(@Nullable ServletConfig servletConfig);
 
 	/**
+	 * 获取 Servlet 配置
+	 *
 	 * Return the ServletConfig for this web application context, if any.
 	 */
 	@Nullable
 	ServletConfig getServletConfig();
 
 	/**
+	 * 为 ApplicationContext 添加命名控件
+	 *
 	 * Set the namespace for this web application context,
 	 * to be used for building a default context config location.
 	 * The root web application context does not have a namespace.
@@ -81,12 +88,16 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	void setNamespace(@Nullable String namespace);
 
 	/**
+	 * 获取命名空间
+	 *
 	 * Return the namespace for this web application context, if any.
 	 */
 	@Nullable
 	String getNamespace();
 
 	/**
+	 * 为 ApplicationContext 添加配置路径
+	 *
 	 * Set the config locations for this web application context in init-param style,
 	 * i.e. with distinct locations separated by commas, semicolons or whitespace.
 	 * <p>If not set, the implementation is supposed to use a default for the
@@ -95,6 +106,8 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	void setConfigLocation(String configLocation);
 
 	/**
+	 * 为 ApplicationContext 添加多个配置路径
+	 *
 	 * Set the config locations for this web application context.
 	 * <p>If not set, the implementation is supposed to use a default for the
 	 * given namespace or the root web application context, as appropriate.
@@ -102,6 +115,8 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	void setConfigLocations(String... configLocations);
 
 	/**
+	 * 获取配置路径
+	 *
 	 * Return the config locations for this web application context,
 	 * or {@code null} if none specified.
 	 */

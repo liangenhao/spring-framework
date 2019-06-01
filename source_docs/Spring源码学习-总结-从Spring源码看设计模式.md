@@ -1,5 +1,5 @@
 ---
-title: Spring源码学习-总结-Spring中的设计模式
+title: Spring源码学习-总结-从Spring源码看设计模式
 date: 2019-04-22
 categories: 源码学习
 tags: [Spring, 设计模式]
@@ -179,6 +179,18 @@ Spring的bean的scope=prototype
 
 详见 [创建Bean的实例](05.8.2-Spring源码学习-IOC-加载Bean-创建Bean-创建Bean的实例.md) 中的实例化策略。
 
+【`MessageSource`】：
+
+详见 [ApplicationContext相关接口](11-Spring源码学习-容器功能扩展-ApplicationContext相关接口.md) 中的`MessageSource`。
+
 ## 代理模式
 
 TODO
+
+
+
+## 门面模式
+
+【`ApplicationContext`】：
+
+`ApplicationContext`整合了`BeanFactory`、`ApplicationEventPublisher`、`ResourceLoader`、`MessageSource`等，提供了统一的入口，即门面模式。

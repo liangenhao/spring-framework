@@ -94,11 +94,13 @@ MyTestBean bean = (MyTestBean)factory.getBean("myTestBean");
 
 
 
-
-
 ## 容器的功能扩展
 
-TODO
+`ApplicationContext`体系。
+
+详见 ：
+
+- [ApplicationContext相关接口](11-Spring源码学习-容器功能扩展-ApplicationContext相关接口.md)
 
 
 
