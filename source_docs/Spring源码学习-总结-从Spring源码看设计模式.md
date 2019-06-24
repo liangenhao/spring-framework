@@ -31,7 +31,7 @@ Spring中有一种bean是`FactoryBean`，在获取bean时，如果该bean是`Fac
 
 ## 单例模式
 
-【Spring中的Bean 模式都是单例模式】
+【Spring中的Bean 模式都是默认是单例模式】
 
 
 
