@@ -108,7 +108,7 @@ Spring 为我们提供了几个常用的`BeanFactoryPostProcessor`：
 
 - `PropertyOverrideConfigurer`：允许我们使用占位符来明确表明bean 定义中的 property 与 properties 文件中的各配置项之间的对应关系。
 
-  > 详见：TODO
+  > 详见：[内置实现PropertyOverrideConfigurer](10.2-Spring源码学习-深入学习BeanFactoryPostProcessor接口-内置实现PropertyOverrideConfigurer.md)
 
 
 

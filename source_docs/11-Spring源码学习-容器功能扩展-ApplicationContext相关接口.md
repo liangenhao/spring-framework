@@ -541,7 +541,7 @@ public void afterPropertiesSet() {
 
 当容器处于激活状态时，调用`refresh()`方法，执行整个 Spring 容器的初始化过程。
 
-> 详见：TODO
+> 详见：[ApplicationContext的refresh()方法](12-Spring源码学习-容器功能扩展-ApplicationContext的refresh()方法.md)
 
 #### BeanNameAware
 
@@ -563,4 +563,3 @@ public void setBeanName(String name) {
 ## 参考资料
 
 - 芋道源码 精尽 Spring 源码分析
-- 《Spring源码深度解析 第2版》

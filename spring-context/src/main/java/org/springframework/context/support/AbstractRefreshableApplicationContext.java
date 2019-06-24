@@ -122,15 +122,24 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		// 若已经有 BeanFactory 对象了，销毁它们的bean和BeanFactory
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
+			// 创建 DefaultListableBeanFactory
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			// 为了序列化指定id，如果需要的话，让这个BeanFactory从id反序列化到BeanFactory对象
 			beanFactory.setSerializationId(getId());
+			// 定制 BeanFactory，设置相关属性，包括是否允许覆盖同名称的不同定义的对象以及循环依赖以及设置@Autowired和@Qualifier注解解析器
 			customizeBeanFactory(beanFactory);
+			// 加载BeanDefinitions 初始化 DocumentReader，进行xml文件读取和解析
+			// 该方法有不同的实现：
+			// AbstractXmlApplicationContext，进行xml文件读取和解析
+			// AnnotationConfigWebApplicationContext, 进行注解的解析。
 			loadBeanDefinitions(beanFactory);
+			// 设置 Context 的 BeanFactory
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
 			}
